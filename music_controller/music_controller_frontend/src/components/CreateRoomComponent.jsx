@@ -8,7 +8,6 @@ import { Link } from "react-router-dom";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Paper from "@mui/material/Paper";
 import { useState } from "react";
@@ -27,7 +26,7 @@ export default function CreateRoomComponent() {
         setGuestCanPause(event.target.value);
     }
 
-    function handleCreateRoom() {
+    async function handleCreateRoom() {
         const requestOptions = {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -36,10 +35,14 @@ export default function CreateRoomComponent() {
                 guest_can_pause: guestCanPause
             })
         };
-
-        fetch('/api/create_room/', requestOptions)
-            .then((response) => response.json())
-            .then((data) => console.log(data));
+        
+        try {
+            const response = await fetch('/api/create_room/', requestOptions);
+            const result = await response.json();
+            window.location.href = `/room/${result.code}`
+        } catch (error) {
+            console.error(error.message);
+        }   
     }
 
     return (

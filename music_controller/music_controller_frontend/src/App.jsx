@@ -2,6 +2,7 @@ import HomePageComponent from './components/HomePageComponent.jsx';
 import CreateRoomComponent from './components/CreateRoomComponent.jsx';
 import RoomJoinComponent from './components/RoomJoinComponent.jsx';
 import RootLayout from './layouts/RootLayoutComponent.jsx';
+import RoomComponent from './components/RoomComponent.jsx';
 import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from 'react-router-dom';
 
 export default function App() {
@@ -11,9 +12,14 @@ export default function App() {
                 <Route index element={<HomePageComponent />} />
                 <Route path='create_room' element={<CreateRoomComponent />} />
                 <Route path='join_room' element={<RoomJoinComponent />} />
+                <Route path='room/:roomCode' element={<RoomComponent />} />
             </Route>
         )
     )
 
-    return <RouterProvider router={router} />
+    return (
+        <div className='center'>
+            <RouterProvider router={router} />
+        </div>
+    );
 }
