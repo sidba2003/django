@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Grid, Button, Typography } from '@mui/material';
 import { useParams } from "react-router";
 
 export default function RoomComponent() {
@@ -26,17 +27,44 @@ export default function RoomComponent() {
         }
     , []);
 
-    const styles = {
-        display: "flex",
-        flexDirection: "column"
+    async function handleLeaveRoom() {
+        try {
+            const response = await fetch("/api/user_room/", { method: 'DELETE' });
+            if (response.ok) {
+                window.location.href = "/";
+            }
+        } catch (error) {
+            console.error(error.message);
+        }
     }
 
     return (
-        <div style={styles}>
-            <p>{roomDetails.votes_to_skip}</p>
-            <p>{String(roomDetails.guest_can_pause)}</p>
-            <p>{String(roomDetails.is_host)}</p>
-            <p>{roomCode}</p>
-        </div>
+        <Grid container direction="column" spacing={1}>
+            <grid item xs={12} align="center">
+                <Typography variant="h4" component="h4">
+                    Code: {roomCode}
+                </Typography>
+            </grid>
+            <grid item xs={12} align="center">
+                <Typography variant="h4" component="h4">
+                    Votes to Skip: {roomDetails.votes_to_skip}
+                </Typography>
+            </grid>
+            <grid item xs={12} align="center">
+                <Typography variant="h4" component="h4">
+                    Is Host: {String(roomDetails.is_host)}
+                </Typography>
+            </grid>
+            <grid item xs={12} align="center">
+                <Typography variant="h4" component="h4">
+                    Code: {roomCode}
+                </Typography>
+            </grid>
+            <grid item xs={12} align="center">
+                <Button variant="contained" color="primary" onClick={handleLeaveRoom}>
+                    Leave Room
+                </Button>
+            </grid>
+        </Grid>
     );
 }

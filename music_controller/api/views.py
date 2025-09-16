@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Room
 from .serializers import RoomSerializer, CreateRoomSerializer
+from django.http import JsonResponse
 
 
 class RoomView(generics.ListAPIView):
@@ -79,3 +80,24 @@ class JoinRoom(APIView):
             return Response({'Bad Request': 'Invalid Code'}, status=status.HTTP_404_NOT_FOUND)
 
         return Response({'Bad Request': 'Invalid POST Data, Did not find a Code Key'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserRoom(APIView):
+    def get(self, request, format=None):
+        return JsonResponse({
+            'user_room': self.request.session.get('room_code')
+        }, status=status.HTTP_200_OK)
+
+    def delete(self, request, format=None):
+        if self.request.session.exists(self.request.session.session_key):
+            session_key = self.request.session.session_key
+            
+            room = Room.objects.filter(host=session_key)
+
+            if room.exists():
+                room.delete()
+            
+            if 'room_code' in self.request.session:
+                self.request.session.pop('room_code')
+
+        return Response(status=status.HTTP_200_OK)
