@@ -1,9 +1,19 @@
 import { useState, useEffect } from "react";
-import { Grid, Button, Typography } from '@mui/material';
+import Button from "@mui/material/Button";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import TextField from "@mui/material/TextField";
+import FormHelperText from "@mui/material/FormHelperText";
+import FormControl from "@mui/material/FormControl";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import { useParams } from "react-router";
 
 export default function RoomComponent() {
     const [roomDetails, setRoomDetails] = useState({});
+    const [votesToSkip, setVotesToSkip] = useState(0);
+    const [guestControlState, setGuestControlState] = useState(null);
 
     const { roomCode } = useParams();
 
@@ -17,7 +27,10 @@ export default function RoomComponent() {
                     }
 
                     const result = await response.json();
+
                     setRoomDetails(result);
+                    setVotesToSkip(result.votes_to_skip);
+                    setGuestControlState(result.guest_can_pause);
                 } catch (error) {
                     console.error(error.message);
                 }
@@ -38,6 +51,41 @@ export default function RoomComponent() {
         }
     }
 
+    function handeGuesControlChange(event){
+        setGuestControlState(event.target.value);
+    }
+
+    function handleVotesChange(event) {
+        setVotesToSkip(event.target.value);
+    }
+
+    async function handleEditRoom() {
+        const requestOptions = {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                guest_can_pause: guestControlState,
+                votes_to_skip: votesToSkip,
+                code: roomCode
+            })
+        }
+
+        try {
+            const response = await fetch('/api/user_room/', requestOptions);
+            const data = await response.json();
+
+            if (!response.ok){
+                var error = new Error('Error- ' + response.status + ":" + response.statusText);
+                error.response = response;
+                throw error;
+            }
+
+            console.log('new room data =>', data);
+        } catch (error) {
+            console.error(error.message);
+        }  
+    }
+
     return (
         <Grid container direction="column" spacing={1}>
             <grid item xs={12} align="center">
@@ -45,21 +93,39 @@ export default function RoomComponent() {
                     Code: {roomCode}
                 </Typography>
             </grid>
-            <grid item xs={12} align="center">
-                <Typography variant="h4" component="h4">
-                    Votes to Skip: {roomDetails.votes_to_skip}
-                </Typography>
-            </grid>
-            <grid item xs={12} align="center">
-                <Typography variant="h4" component="h4">
-                    Is Host: {String(roomDetails.is_host)}
-                </Typography>
-            </grid>
-            <grid item xs={12} align="center">
-                <Typography variant="h4" component="h4">
-                    Code: {roomCode}
-                </Typography>
-            </grid>
+            { 
+            roomDetails.is_host ?
+                <>
+                    <grid item>
+                        <FormControl component="fieldset">
+                            <FormHelperText>
+                                <div align="center">Guest Control of Playback State</div>
+                            </FormHelperText>
+                                <RadioGroup row onChange={handeGuesControlChange} defaultValue={String(guestControlState)}>
+                                    <FormControlLabel value="true" control={<Radio color="primary" />} label="Play/Pause" labelPlacement="bottom" />
+                                    <FormControlLabel value="false" control={<Radio color="secondary" />} label="No control" labelPlacement="bottom" />
+                                </RadioGroup>
+                        </FormControl>
+                    </grid>
+
+                    <grid item>
+                        <FormControl>
+                            <TextField onChange={handleVotesChange} required type="number" defaultValue={votesToSkip}
+                                inputProps={{ min: 1, style: { textAlign: "center" } }} />
+                            <FormHelperText>
+                                <div align="center">Votes required to skip Song</div>
+                            </FormHelperText>
+                        </FormControl>
+                    </grid>
+                    <grid item>
+                        <Button color="secondary" onClick={handleEditRoom} variant="contained">
+                            Edit Room Settings
+                        </Button>
+                    </grid>
+                </>
+            :
+            null
+            }
             <grid item xs={12} align="center">
                 <Button variant="contained" color="primary" onClick={handleLeaveRoom}>
                     Leave Room
