@@ -14,6 +14,7 @@ export default function RoomComponent() {
     const [roomDetails, setRoomDetails] = useState({});
     const [votesToSkip, setVotesToSkip] = useState(0);
     const [guestControlState, setGuestControlState] = useState(null);
+    const [showSettings, setShowSettings] = useState(false);
 
     const { roomCode } = useParams();
 
@@ -94,9 +95,10 @@ export default function RoomComponent() {
                 </Typography>
             </grid>
             { 
-            roomDetails.is_host ?
+            showSettings 
+                ?
                 <>
-                    <grid item>
+                    <grid item align="center">
                         <FormControl component="fieldset">
                             <FormHelperText>
                                 <div align="center">Guest Control of Playback State</div>
@@ -108,7 +110,7 @@ export default function RoomComponent() {
                         </FormControl>
                     </grid>
 
-                    <grid item>
+                    <grid item align="center">
                         <FormControl>
                             <TextField onChange={handleVotesChange} required type="number" defaultValue={votesToSkip}
                                 inputProps={{ min: 1, style: { textAlign: "center" } }} />
@@ -117,14 +119,24 @@ export default function RoomComponent() {
                             </FormHelperText>
                         </FormControl>
                     </grid>
-                    <grid item>
+                    <grid item align="center">
                         <Button color="secondary" onClick={handleEditRoom} variant="contained">
                             Edit Room Settings
                         </Button>
                     </grid>
                 </>
-            :
+                :
             null
+            }
+            {
+                roomDetails.is_host ?
+                    <grid item xs={12} align="center">
+                        <Button variant="contained" color="primary" onClick={() => setShowSettings((prev) => !prev)}>
+                            {!showSettings ? "Show Settings" : "Close Settings"}
+                        </Button>
+                    </grid>
+                :
+                    null
             }
             <grid item xs={12} align="center">
                 <Button variant="contained" color="primary" onClick={handleLeaveRoom}>
