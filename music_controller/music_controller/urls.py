@@ -20,5 +20,6 @@ from django.urls import path, include, re_path
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
+    path('spotify/', include('spotify.urls')),
     re_path(r'^.*$', include('frontend.urls'), name='catch_all')
 ]

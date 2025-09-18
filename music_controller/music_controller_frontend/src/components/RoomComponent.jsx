@@ -15,6 +15,7 @@ export default function RoomComponent() {
     const [votesToSkip, setVotesToSkip] = useState(0);
     const [guestControlState, setGuestControlState] = useState(null);
     const [showSettings, setShowSettings] = useState(false);
+    const [spotifyAuthenticated, setSpotifyAuthenticated] = useState(false);
 
     const { roomCode } = useParams();
 
@@ -32,6 +33,22 @@ export default function RoomComponent() {
                     setRoomDetails(result);
                     setVotesToSkip(result.votes_to_skip);
                     setGuestControlState(result.guest_can_pause);
+
+                    if (result.is_host){
+                        fetch('/spotify/is_authenticated')
+                            .then((response) => response.json())
+                            .then((data) => {
+                                setSpotifyAuthenticated(data.status);
+                                if (!data.status){
+                                    fetch('/spotify/get_auth_url').
+                                        then((response) => response.json())
+                                        .then((data) => {
+                                            window.location.replace(data.url);
+                                        })
+                                }
+                            }
+                        )
+                    }
                 } catch (error) {
                     console.error(error.message);
                 }
