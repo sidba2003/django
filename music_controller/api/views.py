@@ -2,7 +2,7 @@ from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Room
-from .serializers import RoomSerializer, CreateRoomSerializer, EditRoomSerializer
+from .serializers import RoomSerializer, CreateRoomSerializer, EditRoomSerializer, CurrentVotes
 from django.http import JsonResponse
 
 
@@ -124,3 +124,38 @@ class UserRoom(APIView):
             return Response({'Bad Request': 'Room Code Not Found!'}, status=status.HTTP_404_NOT_FOUND)
         
         return Response({'Bad Request': 'Invalid Data!'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RoomVotes(APIView):
+    serializer_class = CurrentVotes
+    
+    def get(self, request, format=None):
+        room_code = self.request.session['room_code']
+        room = Room.objects.filter(code=room_code)
+        if room.exists():
+            data = self.serializer_class(room[0]).data
+            return Response(data, status=status.HTTP_200_OK)
+        
+        return Response({}, status=status.HTTP_404_NOT_FOUND)
+    
+    def put(self, request, format=None):
+        room_code = self.request.session['room_code']
+        room = Room.objects.filter(code=room_code)
+        if room.exists():
+            room = room[0]
+            room.current_votes += 1
+            room.save()
+            return Response({}, status=status.HTTP_204_NO_CONTENT)
+
+        return Response({}, status=status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request, format=None):
+        room_code = self.request.session['room_code']
+        room = Room.objects.filter(code=room_code)
+        if room.exists():
+            room = room[0]
+            room.current_votes = 0
+            room.save()
+            return Response({}, status=status.HTTP_204_NO_CONTENT)
+
+        return Response({}, status=status.HTTP_404_NOT_FOUND)

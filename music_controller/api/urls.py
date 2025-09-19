@@ -4,7 +4,8 @@ from .views import (
                     CreateRoomView, 
                     GetRoom,
                     JoinRoom,
-                    UserRoom
+                    UserRoom,
+                    RoomVotes
                 )
 
 urlpatterns = [
@@ -12,5 +13,6 @@ urlpatterns = [
     path('create_room/', CreateRoomView.as_view()),
     path('room', GetRoom.as_view()),
     path('join_room/', JoinRoom.as_view()),
-    path('user_room/', UserRoom.as_view())
+    path('user_room/', UserRoom.as_view()),
+    path('current_votes/', RoomVotes.as_view())
 ]

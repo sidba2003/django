@@ -34,3 +34,10 @@ class EditRoomSerializer(serializers.ModelSerializer):
             'guest_can_pause', 
             'votes_to_skip'
         )
+
+class CurrentVotes(serializers.ModelSerializer):
+    class Meta:
+        model = Room
+        fields = (
+            'current_votes',
+        )

@@ -23,3 +23,18 @@ html, body {
     left: 50%;
     transform: translate(-50%, -50%);
 }
+
+.music-player-class {
+    display: flex;
+    flex-direction: column;
+    font-size: larger;
+    border: solid black;
+    border-radius: 5px;
+    align-items: center;
+    justify-content: center;
+}
+
+.album-cover-class {
+    width: 100px;
+    height: 100px;
+}
